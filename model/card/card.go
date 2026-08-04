@@ -1,6 +1,6 @@
 package card
 
-var VaultCardRequest struct {
+type VaultCardRequest struct {
 	PaymentMethodId string `json:"paymentMethodId"`
 	BillingAddress  struct {
 		Address1   string  `json:"address1"`
