@@ -1,12 +1,11 @@
 package main
 
 import (
+	"braintreeIntegrationGo/application"
 	"context"
 	"fmt"
 	"os"
 	"os/signal"
-
-	"github.com/dreamsofcode-io/orders-api/application"
 )
 
 func main() {
