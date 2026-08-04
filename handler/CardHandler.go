@@ -2,6 +2,7 @@ package handler
 
 import (
 	"braintreeIntegrationGo/model/card"
+	"braintreeIntegrationGo/service"
 	"braintreeIntegrationGo/validator"
 	"encoding/json"
 	"fmt"
@@ -12,6 +13,7 @@ type Card struct {
 }
 
 var cardValidator = new(validator.CardValidator)
+var cardAdapterService = new(service.CardAdapterService)
 
 func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
 
@@ -29,5 +31,15 @@ func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Request body:", body)
+
+	//Adapt to the vendor request.
+	vendorReq, err := cardAdapterService.AdaptVaultCardRequest(body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("VendorRequest:", vendorReq)
 
 }
