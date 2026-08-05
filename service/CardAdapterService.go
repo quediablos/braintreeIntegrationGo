@@ -1,18 +1,18 @@
 package service
 
 import (
+	"braintreeIntegrationGo/clientmodel/request"
 	"braintreeIntegrationGo/model/card"
-	"braintreeIntegrationGo/vendormodel"
 )
 
 type CardAdapterService struct {
 }
 
-func (h *CardAdapterService) AdaptVaultCardRequest(request card.VaultCardRequest) (vendormodel.VaultCardInput, error) {
+func (h *CardAdapterService) AdaptVaultCardRequest(request card.VaultCardRequest) (request.VaultCardInput, error) {
 
-	vaultCardInput := vendormodel.VaultCardInput{
+	vaultCardInput := request.VaultCardInput{
 		PaymentMethodId: request.PaymentMethodId,
-		BillingAddress: &vendormodel.BillingAddress{
+		BillingAddress: &request.BillingAddress{
 			AddressLine1: request.BillingAddress.Address1,
 			AddressLine2: request.BillingAddress.Address2,
 			CountryCode:  request.BillingAddress.Country,
@@ -20,7 +20,7 @@ func (h *CardAdapterService) AdaptVaultCardRequest(request card.VaultCardRequest
 			LastName:     request.BillingAddress.LastName,
 			PostalCode:   request.BillingAddress.PostalCode,
 		},
-		Verification: &vendormodel.VerificationVaultCard{},
+		Verification: &request.VerificationVaultCard{},
 	}
 
 	return vaultCardInput, nil

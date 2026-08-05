@@ -1,9 +1,9 @@
-package vendormodel
+package request
 
 type VaultCardInput struct {
-	CustomerId      string                `json:"customerId"`
-	PaymentMethodId string                `json:"paymentMethodId"`
-	BillingAddress  *BillingAddress       `json:"billingAddress"`
+	CustomerId      string                 `json:"customerId"`
+	PaymentMethodId string                 `json:"paymentMethodId"`
+	BillingAddress  *BillingAddress        `json:"billingAddress"`
 	Verification    *VerificationVaultCard `json:"verification"`
 }
 
