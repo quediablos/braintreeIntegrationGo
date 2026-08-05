@@ -1,5 +1,15 @@
 package request
 
+type GraphQlQuery[T any] struct {
+	Query            string              `json:"query"`
+	GraphQlVariables GraphQlVariables[T] `json:"graphQlVariables"`
+	OperationName    string              `json:"operationName"`
+}
+
+type GraphQlVariables[T any] struct {
+	Input T `json:"input"`
+}
+
 type VaultCardInput struct {
 	CustomerId      string                 `json:"customerId"`
 	PaymentMethodId string                 `json:"paymentMethodId"`

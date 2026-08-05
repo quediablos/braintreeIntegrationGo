@@ -8,17 +8,17 @@ import (
 type CardAdapterService struct {
 }
 
-func (h *CardAdapterService) AdaptVaultCardRequest(request card.VaultCardRequest) (request.VaultCardInput, error) {
+func (h *CardAdapterService) AdaptVaultCardRequest(r card.VaultCardRequest) (request.VaultCardInput, error) {
 
 	vaultCardInput := request.VaultCardInput{
-		PaymentMethodId: request.PaymentMethodId,
+		PaymentMethodId: r.PaymentMethodId,
 		BillingAddress: &request.BillingAddress{
-			AddressLine1: request.BillingAddress.Address1,
-			AddressLine2: request.BillingAddress.Address2,
-			CountryCode:  request.BillingAddress.Country,
-			FirstName:    request.BillingAddress.FirstName,
-			LastName:     request.BillingAddress.LastName,
-			PostalCode:   request.BillingAddress.PostalCode,
+			AddressLine1: r.BillingAddress.Address1,
+			AddressLine2: r.BillingAddress.Address2,
+			CountryCode:  r.BillingAddress.Country,
+			FirstName:    r.BillingAddress.FirstName,
+			LastName:     r.BillingAddress.LastName,
+			PostalCode:   r.BillingAddress.PostalCode,
 		},
 		Verification: &request.VerificationVaultCard{},
 	}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"braintreeIntegrationGo/client"
 	"braintreeIntegrationGo/model/card"
 	"braintreeIntegrationGo/service"
 	"braintreeIntegrationGo/validator"
@@ -14,6 +15,7 @@ type Card struct {
 
 var cardValidator = new(validator.CardValidator)
 var cardAdapterService = new(service.CardAdapterService)
+var braintreeClient = new(client.BraintreeClient)
 
 func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
 
@@ -39,6 +41,16 @@ func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	//Call the braintree client.
+	clientRes, err := braintreeClient.VaultCard(vendorReq)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	_ = clientRes
 
 	fmt.Println("VendorRequest:", vendorReq)
 
