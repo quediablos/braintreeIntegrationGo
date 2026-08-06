@@ -12,6 +12,7 @@ func (h *CardAdapterService) AdaptVaultCardRequest(r card.VaultCardRequest) (req
 
 	vaultCardInput := request.VaultCardInput{
 		PaymentMethodId: r.PaymentMethodId,
+		CustomerId:      r.CustomerData.PspCustomerId,
 		BillingAddress: &request.BillingAddress{
 			AddressLine1: r.BillingAddress.Address1,
 			AddressLine2: r.BillingAddress.Address2,
@@ -20,7 +21,9 @@ func (h *CardAdapterService) AdaptVaultCardRequest(r card.VaultCardRequest) (req
 			LastName:     r.BillingAddress.LastName,
 			PostalCode:   r.BillingAddress.PostalCode,
 		},
-		Verification: &request.VerificationVaultCard{},
+		Verification: &request.VerificationVaultCard{
+			MerchantAccountId: r.MerchantAccountId,
+		},
 	}
 
 	return vaultCardInput, nil

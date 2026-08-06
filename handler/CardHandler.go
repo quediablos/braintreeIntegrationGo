@@ -10,14 +10,15 @@ import (
 	"net/http"
 )
 
-type Card struct {
+type CardHandler struct {
+	BraintreeClient *client.BraintreeClient
 }
 
+// TODO:move these to the construction (just like BraintreeClient field).
 var cardValidator = new(validator.CardValidator)
 var cardAdapterService = new(service.CardAdapterService)
-var braintreeClient = new(client.BraintreeClient)
 
-func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
+func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 
 	var body card.VaultCardRequest
 
@@ -43,11 +44,18 @@ func (h *Card) Vault(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Call the braintree client.
-	clientRes, err := braintreeClient.VaultCard(vendorReq)
-
+	clientRes, err := h.BraintreeClient.VaultCard(vendorReq)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
+	}
+
+	//Check for errors.
+	if clientRes.Errors != nil {
+		w.WriteHeader(http.StatusBadRequest) //TODO:proper error handling
+		return
+	} else {
+		//TODO:adapt the response
 	}
 
 	_ = clientRes

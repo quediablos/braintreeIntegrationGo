@@ -1,9 +1,9 @@
 package request
 
 type GraphQlQuery[T any] struct {
-	Query            string              `json:"query"`
-	GraphQlVariables GraphQlVariables[T] `json:"graphQlVariables"`
-	OperationName    string              `json:"operationName"`
+	Query         string              `json:"query"`
+	Variables     GraphQlVariables[T] `json:"variables"`
+	OperationName string              `json:"operationName"`
 }
 
 type GraphQlVariables[T any] struct {
@@ -18,12 +18,12 @@ type VaultCardInput struct {
 }
 
 type BillingAddress struct {
-	AddressLine1 string  `json:"addressLine1"`
-	AddressLine2 string  `json:"addressLine2"`
-	CountryCode  string  `json:"countryCode"`
-	FirstName    string  `json:"firstName"`
-	LastName     string  `json:"lastName"`
-	PostalCode   *string `json:"postalCode"`
+	AddressLine1 string `json:"addressLine1"`
+	AddressLine2 string `json:"addressLine2"`
+	CountryCode  string `json:"countryCode"`
+	FirstName    string `json:"firstName"`
+	LastName     string `json:"lastName"`
+	PostalCode   string `json:"postalCode"`
 }
 
 type VerificationVaultCard struct {

@@ -1,14 +1,14 @@
 package response
 
 type GraphQlResponse[T any] struct {
-	data       T
-	errors     []GraphQlError
-	extensions GraphQlErrorExtension //TODO: is this needed because extensions already exists in GraphQlError
+	Data   T              `json:"data"`
+	Errors []GraphQlError `json:"errors"`
+	//Extensions GraphQlErrorExtension `json:"extensions"`
 }
 
 type GraphQlError struct {
-	Message    string                  `json:"message"`
-	Extensions []GraphQlErrorExtension `json:"extensions"`
+	Message    string                `json:"message"`
+	Extensions GraphQlErrorExtension `json:"extensions"`
 }
 
 type GraphQlErrorExtension struct {

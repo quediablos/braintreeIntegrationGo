@@ -1,6 +1,7 @@
 package application
 
 import (
+	"braintreeIntegrationGo/client"
 	"context"
 	"fmt"
 	"net/http"
@@ -8,12 +9,17 @@ import (
 )
 
 type App struct {
-	router http.Handler
+	router          http.Handler
+	braintreeClient *client.BraintreeClient
 }
 
 func New() *App {
 
-	app := &App{}
+	braintreeClient := client.NewBraintreeClient()
+
+	app := &App{
+		braintreeClient: braintreeClient,
+	}
 
 	app.loadRoutes()
 
