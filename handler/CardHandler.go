@@ -54,12 +54,17 @@ func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 	if clientRes.Errors != nil {
 		w.WriteHeader(http.StatusBadRequest) //TODO:proper error handling
 		return
-	} else {
-		//TODO:adapt the response
 	}
 
-	_ = clientRes
+	responseNormalized, err := cardAdapterService.AdaptVaultCardResponse(clientRes.Data)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	fmt.Println("VendorRequest:", vendorReq)
-
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(responseNormalized); err != nil {
+		fmt.Printf("Failed to encode response: %v\n", err)
+	}
 }
