@@ -34,7 +34,7 @@ func (h *CardAdapterService) AdaptVaultCardResponse(r response.VaultCreditCardRe
 
 	//TODO:error and decline handling.
 
-	v := r.Data.VaultCreditCard
+	v := r.VaultCreditCard
 	ver := v.Verification
 	details := ver.PaymentMethod.Details
 	snapshot := ver.PaymentMethodSnapshot
@@ -86,4 +86,5 @@ func (h *CardAdapterService) AdaptVaultCardResponse(r response.VaultCreditCardRe
 	}
 
 	return adapted, nil
+
 }
