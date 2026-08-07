@@ -11,12 +11,10 @@ import (
 )
 
 type CardHandler struct {
-	BraintreeClient *client.BraintreeClient
+	BraintreeClient    *client.BraintreeClient
+	CardValidator      *validator.CardValidator
+	CardAdapterService *service.CardAdapterService
 }
-
-// TODO:move these to the construction (just like BraintreeClient field).
-var cardValidator = new(validator.CardValidator)
-var cardAdapterService = new(service.CardAdapterService)
 
 func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 
@@ -28,7 +26,7 @@ func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//TODO:need to return a json response.
-	if _, err := cardValidator.Validate(body); err != nil {
+	if _, err := h.CardValidator.Validate(body); err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
@@ -36,7 +34,7 @@ func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Request body:", body)
 
 	//Adapt to the vendor request.
-	vendorReq, err := cardAdapterService.AdaptVaultCardRequest(body)
+	vendorReq, err := h.CardAdapterService.AdaptVaultCardRequest(body)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -56,7 +54,7 @@ func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseNormalized, err := cardAdapterService.AdaptVaultCardResponse(clientRes.Data)
+	responseNormalized, err := h.CardAdapterService.AdaptVaultCardResponse(clientRes.Data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

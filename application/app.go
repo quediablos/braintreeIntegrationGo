@@ -2,6 +2,8 @@ package application
 
 import (
 	"braintreeIntegrationGo/client"
+	"braintreeIntegrationGo/service"
+	"braintreeIntegrationGo/validator"
 	"context"
 	"fmt"
 	"net/http"
@@ -9,16 +11,22 @@ import (
 )
 
 type App struct {
-	router          http.Handler
-	braintreeClient *client.BraintreeClient
+	router             http.Handler
+	braintreeClient    *client.BraintreeClient
+	CardValidator      *validator.CardValidator
+	CardAdapterService *service.CardAdapterService
 }
 
 func New() *App {
 
 	braintreeClient := client.NewBraintreeClient()
+	CardValidator := validator.NewCardValidator()
+	CardAdapterService := service.NewCardAdapterService()
 
 	app := &App{
-		braintreeClient: braintreeClient,
+		braintreeClient:    braintreeClient,
+		CardValidator:      CardValidator,
+		CardAdapterService: CardAdapterService,
 	}
 
 	app.loadRoutes()

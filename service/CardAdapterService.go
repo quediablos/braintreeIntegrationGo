@@ -9,6 +9,10 @@ import (
 type CardAdapterService struct {
 }
 
+func NewCardAdapterService() *CardAdapterService {
+	return &CardAdapterService{}
+}
+
 func (h *CardAdapterService) AdaptVaultCardRequest(r card.VaultCardRequest) (request.VaultCardInput, error) {
 
 	vaultCardInput := request.VaultCardInput{

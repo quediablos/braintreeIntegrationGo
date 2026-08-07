@@ -7,6 +7,10 @@ import (
 
 type CardValidator struct{}
 
+func NewCardValidator() *CardValidator {
+	return &CardValidator{}
+}
+
 func (h *CardValidator) Validate(request card.VaultCardRequest) (bool, error) {
 
 	if request.PaymentMethodId == "" {
