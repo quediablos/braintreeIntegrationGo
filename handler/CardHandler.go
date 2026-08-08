@@ -11,9 +11,9 @@ import (
 )
 
 type CardHandler struct {
-	BraintreeClient    *client.BraintreeClient
-	CardValidator      *validator.CardValidator
-	CardAdapterService *service.CardAdapterService
+	BraintreeClient    client.BraintreeClientInterface
+	CardValidator      validator.CardValidatorInterface
+	CardAdapterService service.CardAdapterServiceInterface
 }
 
 func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {

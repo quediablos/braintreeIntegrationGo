@@ -13,6 +13,11 @@ func NewCardAdapterService() *CardAdapterService {
 	return &CardAdapterService{}
 }
 
+type CardAdapterServiceInterface interface {
+	AdaptVaultCardRequest(r card.VaultCardRequest) (request.VaultCardInput, error)
+	AdaptVaultCardResponse(r response.VaultCreditCardResponse) (card.VaultCardResponse, error)
+}
+
 func (h *CardAdapterService) AdaptVaultCardRequest(r card.VaultCardRequest) (request.VaultCardInput, error) {
 
 	vaultCardInput := request.VaultCardInput{

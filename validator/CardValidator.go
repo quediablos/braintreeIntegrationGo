@@ -11,6 +11,10 @@ func NewCardValidator() *CardValidator {
 	return &CardValidator{}
 }
 
+type CardValidatorInterface interface {
+	Validate(request card.VaultCardRequest) (bool, error)
+}
+
 func (h *CardValidator) Validate(request card.VaultCardRequest) (bool, error) {
 
 	if request.PaymentMethodId == "" {

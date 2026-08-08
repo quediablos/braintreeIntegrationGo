@@ -26,6 +26,10 @@ func NewBraintreeClient() *BraintreeClient {
 	}
 }
 
+type BraintreeClientInterface interface {
+	VaultCard(r request.VaultCardInput) (response.GraphQlResponse[response.VaultCreditCardResponse], error)
+}
+
 func (h *BraintreeClient) VaultCard(r request.VaultCardInput) (response.GraphQlResponse[response.VaultCreditCardResponse], error) {
 
 	graphQlQuery := request.GraphQlQuery[request.VaultCardInput]{
