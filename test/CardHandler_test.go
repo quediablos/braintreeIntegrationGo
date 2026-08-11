@@ -52,34 +52,42 @@ func TestVault_success(t *testing.T) {
 	mockValidator.On("Validate", mock.AnythingOfType("card.VaultCardRequest")).
 		Return(true, nil)
 
+	vaultCardInputExpected := request.VaultCardInput{
+		PaymentMethodId: "payment_method_id",
+	}
 	mockCardAdapterService := new(MockCardAdapterService)
 	mockCardAdapterService.On("AdaptVaultCardRequest", mock.AnythingOfType("card.VaultCardRequest")).
-		Return(request.VaultCardInput{}, nil)
+		Return(vaultCardInputExpected, nil)
 
 	mockCardAdapterService.On("AdaptVaultCardResponse", mock.AnythingOfType("response.VaultCreditCardResponse")).
 		Return(card.VaultCardResponse{}, nil)
 
-	mockClient := new(MockClient)
-	mockClient.On("VaultCard", mock.AnythingOfType("request.VaultCardInput")).
-		Return(response.GraphQlResponse[response.VaultCreditCardResponse]{}, nil)
+	mockBraintreeClient := new(MockClient)
+	var vaultCreditCardInputCaptured request.VaultCardInput
+	mockBraintreeClient.On("VaultCard", mock.MatchedBy(func(r request.VaultCardInput) bool {
+		vaultCreditCardInputCaptured = r
+		return true
+	})).Return(response.GraphQlResponse[response.VaultCreditCardResponse]{}, nil)
 
 	cardHandler := handler.CardHandler{
 		CardValidator:      mockValidator,
 		CardAdapterService: mockCardAdapterService,
-		BraintreeClient:    mockClient,
-		// ...other fields
+		BraintreeClient:    mockBraintreeClient,
 	}
 
 	reqBody, _ := json.Marshal(card.VaultCardRequest{
 		PaymentMethodId: "fake-valid-nonce",
 	})
 
-	//Mocks
-
 	r := httptest.NewRequest(http.MethodPost, "/cards", bytes.NewBuffer(reqBody))
 	r.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
 	cardHandler.Vault(w, r)
+
+	//Assertions
+	if vaultCreditCardInputCaptured.PaymentMethodId != vaultCardInputExpected.PaymentMethodId {
+		t.Errorf("expected paymentMethodId 'fake-valid-nonce', got '%s'", vaultCreditCardInputCaptured.PaymentMethodId)
+	}
 
 }
