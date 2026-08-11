@@ -2,6 +2,7 @@ package application
 
 import (
 	"braintreeIntegrationGo/client"
+	"braintreeIntegrationGo/kafka"
 	"braintreeIntegrationGo/service"
 	"braintreeIntegrationGo/validator"
 	"context"
@@ -11,10 +12,11 @@ import (
 )
 
 type App struct {
-	router             http.Handler
-	braintreeClient    *client.BraintreeClient
-	CardValidator      *validator.CardValidator
-	CardAdapterService *service.CardAdapterService
+	router               http.Handler
+	braintreeClient      *client.BraintreeClient
+	CardValidator        *validator.CardValidator
+	CardAdapterService   *service.CardAdapterService
+	kafkaListener        *kafka.ExampleTopicListener
 }
 
 func New() *App {
@@ -22,11 +24,13 @@ func New() *App {
 	braintreeClient := client.NewBraintreeClient()
 	CardValidator := validator.NewCardValidator()
 	CardAdapterService := service.NewCardAdapterService()
+	kafkaListener := kafka.NewExampleTopicListener()
 
 	app := &App{
 		braintreeClient:    braintreeClient,
 		CardValidator:      CardValidator,
 		CardAdapterService: CardAdapterService,
+		kafkaListener:      kafkaListener,
 	}
 
 	app.loadRoutes()
@@ -54,8 +58,19 @@ func (app *App) Start(ctx context.Context) error {
 		fmt.Println("started http server")
 	}()
 
+	chKafka := make(chan error, 1)
+	go func() {
+		err := app.kafkaListener.Start(ctx)
+		if err != nil {
+			chKafka <- fmt.Errorf("kafka listener error: %w", err)
+		}
+		close(chKafka)
+	}()
+
 	select {
 	case err := <-chServer:
+		return err
+	case err := <-chKafka:
 		return err
 	case <-ctx.Done():
 		timeout, cancel := context.WithTimeout(context.Background(), 10*time.Second)
