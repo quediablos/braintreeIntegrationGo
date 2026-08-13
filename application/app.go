@@ -12,11 +12,12 @@ import (
 )
 
 type App struct {
-	router             http.Handler
-	braintreeClient    *client.BraintreeClient
-	CardValidator      *validator.CardValidator
-	CardAdapterService *service.CardAdapterService
-	vaultCardPublisher *rabbitmq.VaultCardPublisher
+	router              http.Handler
+	braintreeClient     *client.BraintreeClient
+	CardValidator       *validator.CardValidator
+	CardAdapterService  *service.CardAdapterService
+	vaultCardPublisher  *rabbitmq.VaultCardPublisher
+	vaultCardConsumer   *rabbitmq.VaultCardConsumer
 }
 
 func New() *App {
@@ -30,12 +31,17 @@ func New() *App {
 		fmt.Printf("Warning: RabbitMQ publisher unavailable: %v\n", err)
 	}
 
+	vaultCardConsumer, err := rabbitmq.NewVaultCardConsumer()
+	if err != nil {
+		fmt.Printf("Warning: RabbitMQ consumer unavailable: %v\n", err)
+	}
+
 	app := &App{
 		braintreeClient:    braintreeClient,
 		CardValidator:      CardValidator,
 		CardAdapterService: CardAdapterService,
-		//kafkaListener:      kafkaListener,
 		vaultCardPublisher: vaultCardPublisher,
+		vaultCardConsumer:  vaultCardConsumer,
 	}
 
 	app.loadRoutes()
@@ -63,8 +69,22 @@ func (app *App) Start(ctx context.Context) error {
 		fmt.Println("started http server")
 	}()
 
+	chConsumer := make(chan error, 1)
+	if app.vaultCardConsumer != nil {
+		go func() {
+			if err := app.vaultCardConsumer.Start(ctx); err != nil {
+				chConsumer <- fmt.Errorf("rabbitmq consumer error: %w", err)
+			}
+			close(chConsumer)
+		}()
+	} else {
+		close(chConsumer)
+	}
+
 	select {
 	case err := <-chServer:
+		return err
+	case err := <-chConsumer:
 		return err
 	case <-ctx.Done():
 		timeout, cancel := context.WithTimeout(context.Background(), 10*time.Second)
