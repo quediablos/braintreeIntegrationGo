@@ -2,7 +2,6 @@ package application
 
 import (
 	"braintreeIntegrationGo/client"
-	"braintreeIntegrationGo/kafka"
 	"braintreeIntegrationGo/rabbitmq"
 	"braintreeIntegrationGo/service"
 	"braintreeIntegrationGo/validator"
@@ -17,7 +16,6 @@ type App struct {
 	braintreeClient    *client.BraintreeClient
 	CardValidator      *validator.CardValidator
 	CardAdapterService *service.CardAdapterService
-	kafkaListener      *kafka.ExampleTopicListener
 	vaultCardPublisher *rabbitmq.VaultCardPublisher
 }
 
@@ -26,7 +24,6 @@ func New() *App {
 	braintreeClient := client.NewBraintreeClient()
 	CardValidator := validator.NewCardValidator()
 	CardAdapterService := service.NewCardAdapterService()
-	//kafkaListener := kafka.NewExampleTopicListener()
 
 	vaultCardPublisher, err := rabbitmq.NewVaultCardPublisher()
 	if err != nil {
@@ -66,20 +63,9 @@ func (app *App) Start(ctx context.Context) error {
 		fmt.Println("started http server")
 	}()
 
-	/*chKafka := make(chan error, 1)
-	go func() {
-		err := app.kafkaListener.Start(ctx)
-		if err != nil {
-			chKafka <- fmt.Errorf("kafka listener error: %w", err)
-		}
-		close(chKafka)
-	}()*/
-
 	select {
 	case err := <-chServer:
 		return err
-	/*case err := <-chKafka:
-	return err*/
 	case <-ctx.Done():
 		timeout, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
