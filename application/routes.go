@@ -17,7 +17,10 @@ func (app *App) loadRoutes() {
 
 func (app *App) loadOrderRoutes(router chi.Router) {
 	cardHandler := &handler.CardHandler{
-		BraintreeClient: app.braintreeClient,
+		BraintreeClient:    app.braintreeClient,
+		CardValidator:      app.CardValidator,
+		CardAdapterService: app.CardAdapterService,
+		VaultCardPublisher: app.vaultCardPublisher,
 	}
 
 	router.Post("/", cardHandler.Vault)

@@ -3,6 +3,7 @@ package handler
 import (
 	"braintreeIntegrationGo/client"
 	"braintreeIntegrationGo/model/card"
+	"braintreeIntegrationGo/rabbitmq"
 	"braintreeIntegrationGo/service"
 	"braintreeIntegrationGo/validator"
 	"encoding/json"
@@ -14,6 +15,7 @@ type CardHandler struct {
 	BraintreeClient    client.BraintreeClientInterface
 	CardValidator      validator.CardValidatorInterface
 	CardAdapterService service.CardAdapterServiceInterface
+	VaultCardPublisher *rabbitmq.VaultCardPublisher
 }
 
 func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
@@ -60,9 +62,17 @@ func (h *CardHandler) Vault(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Push to rabbitmq
+	if h.VaultCardPublisher != nil {
+		if err := h.VaultCardPublisher.Publish(r.Context(), responseNormalized); err != nil {
+			fmt.Printf("Failed to publish vault-card event: %v\n", err)
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(responseNormalized); err != nil {
 		fmt.Printf("Failed to encode response: %v\n", err)
 	}
+
 }
